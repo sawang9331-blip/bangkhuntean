@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบรายงาน ส.ดพ.บางขุนเทียน v2.3.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; margin: 0; background-color: #121212; color: #e0e0e0; padding-bottom: 80px; }
+        header { background-color: #b71c1c; padding: 15px; text-align: center; border-bottom: 3px solid #ffeb3b; position: sticky; top: 0; z-index: 1000; }
+        .container { padding: 15px; max-width: 600px; margin: auto; }
+        .form-group { background-color: #1e1e1e; padding: 20px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-top: 5px solid #444; }
+        .group-fire { border-top-color: #ff5252; }
+        .group-rescue { border-top-color: #ffeb3b; }
+        h3 { margin-top: 0; display: flex; align-items: center; gap: 10px; color: #fff; }
+        label { display: block; margin-bottom: 5px; font-size: 13px; color: #bbb; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 6px; border: 1px solid #444; background-color: #2c2c2c; color: white; font-size: 16px; box-sizing: border-box; cursor: pointer; }
+        .car-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #252525; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .time-item label { color: #ffeb3b; font-size: 11px; }
+        .btn-submit { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-red { background-color: #d32f2f; color: white; }
+        .btn-yellow { background-color: #fbc02d; color: #000; }
+        #output { background: #fff; color: #000; padding: 15px; border-radius: 10px; margin-top: 20px; white-space: pre-wrap; display: none; border-left: 8px solid #2e7d32; font-size: 15px; line-height: 1.6; }
+        .copy-hint { color: #4caf50; font-weight: bold; display: none; text-align: center; margin: 15px 0; font-size: 18px; border: 2px solid #4caf50; padding: 10px; border-radius: 8px; }
+
+        /* Overlay System */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2000; align-items: center; justify-content: center; }
+        .editor-container { background: #252525; padding: 20px; border-radius: 15px; width: 90%; max-width: 500px; border: 2px solid #444; }
+        .editor-container h4 { color: #ffeb3b; margin-top: 0; display: flex; align-items: center; gap: 8px; }
+        #expanded-text { width: 100%; height: 200px; background: #121212; color: #fff; padding: 15px; border: 1px solid #555; border-radius: 8px; font-size: 18px; resize: none; }
+        .editor-footer { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-cancel { background: #555; color: white; flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-save { background: #2e7d32; color: white; flex: 2; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>尊 ส.ดพ.บางขุนเทียน (V2.3.0)</h2>
+</header>
+
+<div class="container">
+    <div class="form-group group-fire">
+        <h3>🔥 รายงานเหตุเพลิงไหม้</h3>
+        <label>📍 สถานที่เกิดเหตุ / พิกัด</label>
+        <input type="text" id="fire_place" placeholder="แตะเพื่อระบุสถานที่" readonly onclick="openEditor('fire_place', '📍 สถานที่เกิดเหตุ')">
+        
+        <label>尊 รถที่ออกเหตุ (สูงสุด 3 คัน)</label>
+        <div class="car-grid">
+            <select id="fire_car1"><option value="">-- รถ 1 --</option><option value="บางขุนเทียน 061-1">บางขุนเทียน 061-1</option><option value="บางขุนเทียน 062-1">บางขุนเทียน 062-1</option><option value="บางขุนเทียน 041-1">บางขุนเทียน 041-1</option><option value="บางขุนเทียน 051-1">บางขุนเทียน 051-1</option><option value="บางขุนเทียน 052-1">บางขุนเทียน 052-1</option><option value="บางขุนเทียน 052-2">บางขุนเทียน 052-2</option><option value="บางขุนเทียน 053-1">บางขุนเทียน 053-1</option></select>
+            <select id="fire_car2"><option value="">-- รถ 2 --</option><option value="บางขุนเทียน 061-1">บางขุนเทียน 061-1</option><option value="บางขุนเทียน 062-1">บางขุนเทียน 062-1</option><option value="บางขุนเทียน 041-1">บางขุนเทียน 041-1</option><option value="บางขุนเทียน 051-1">บางขุนเทียน 051-1</option><option value="บางขุนเทียน 052-1">บางขุนเทียน 052-1</option><option value="บางขุนเทียน 052-2">บางขุนเทียน 052-2</option><option value="บางขุนเทียน 053-1">บางขุนเทียน 053-1</option></select>
+            <select id="fire_car3"><option value="">-- รถ 3 --</option><option value="บางขุนเทียน 061-1">บางขุนเทียน 061-1</option><option value="บางขุนเทียน 062-1">บางขุนเทียน 062-1</option><option value="บางขุนเทียน 041-1">บางขุนเทียน 041-1</option><option value="บางขุนเทียน 051-1">บางขุนเทียน 051-1</option><option value="บางขุนเทียน 052-1">บางขุนเทียน 052-1</option><option value="บางขุนเทียน 052-2">บางขุนเทียน 052-2</option><option value="บางขุนเทียน 053-1">บางขุนเทียน 053-1</option></select>
+        </div>
+
+        <div class="time-grid">
+            <div class="time-item"><label>เวลารับแจ้ง</label><input type="time" id="f_t1"></div>
+            <div class="time-item"><label>เวลาแจ้งออก</label><input type="time" id="f_t2"></div>
+            <div class="time-item"><label>เวลา ว.10</label><input type="time" id="f_t3"></div>
+            <div class="time-item"><label>เริ่มใช้น้ำ</label><input type="time" id="f_t4"></div>
+            <div class="time-item"><label>เลิก ว.10</label><input type="time" id="f_t5"></div>
+            <div class="time-item"><label>ว.4 ส.ดพ.</label><input type="time" id="f_t6"></div>
+        </div>
+        
+        <label>👥 ผู้ออกปฏิบัติหน้าที่</label>
+        <textarea id="fire_team" rows="2" placeholder="แตะเพื่อระบุรายชื่อ..." readonly onclick="openEditor('fire_team', '👥 รายชื่อผู้ปฏิบัติหน้าที่')"></textarea>
+        
+        <label>📢 ผู้รายงาน</label>
+        <input type="text" id="fire_sender" placeholder="แตะเพื่อระบุผู้รายงาน" readonly onclick="openEditor('fire_sender', '📢 ผู้รายงาน (เรียกขาน)')">
+        
+        <button class="btn-submit btn-red" onclick="reportFire()">คัดลอกและส่งรายงานเพลิงไหม้</button>
+    </div>
+
+    <div class="form-group group-rescue">
+        <h3>🐾 รายงานช่วยเหลือประชาชน</h3>
+        <label>🐾 ชนิดสัตว์ / เหตุที่ช่วยเหลือ</label>
+        <input type="text" id="res_type_text" placeholder="เช่น งูเหลือม, กำจัดรังต่อ" readonly onclick="openEditor('res_type_text', '🐾 ชนิดสัตว์ / เหตุเหตุ')">
+        
+        <label>📏 ขนาด/จำนวน</label>
+        <input type="text" id="res_len_text" placeholder="เช่น 2 เมตร, 1 ตัว" readonly onclick="openEditor('res_len_text', '📏 ขนาด/จำนวน')">
+        
+        <label>📍 สถานที่ / พิกัด</label>
+        <input type="text" id="res_place" placeholder="แตะเพื่อระบุสถานที่" readonly onclick="openEditor('res_place', '📍 สถานที่เกิดเหตุ')">
+        
+        <label>尊 รถที่ออกเหตุ</label>
+        <select id="res_car_single"><option value="">-- เลือกคันรถ --</option><option value="บางขุนเทียน 061-1">บางขุนเทียน 061-1</option><option value="บางขุนเทียน 062-1">บางขุนเทียน 062-1</option><option value="บางขุนเทียน 041-1">บางขุนเทียน 041-1</option><option value="บางขุนเทียน 051-1">บางขุนเทียน 051-1</option><option value="บางขุนเทียน 052-1">บางขุนเทียน 052-1</option><option value="บางขุนเทียน 052-2">บางขุนเทียน 052-2</option><option value="บางขุนเทียน 053-1">บางขุนเทียน 053-1</option></select>
+
+        <div class="time-grid">
+            <div class="time-item"><label>รับแจ้ง</label><input type="time" id="r_t1"></div>
+            <div class="time-item"><label>แจ้งออก</label><input type="time" id="r_t2"></div>
+            <div class="time-item"><label>ว.10</label><input type="time" id="r_t3"></div>
+            <div class="time-item"><label>เลิก ว.10</label><input type="time" id="r_t4"></div>
+            <div class="time-item"><label>ว.4 ส.ดพ.</label><input type="time" id="r_t5"></div>
+        </div>
+
+        <label>👥 รายชื่อเจ้าหน้าที่</label>
+        <textarea id="res_team" rows="2" placeholder="แตะเพื่อระบุรายชื่อ..." readonly onclick="openEditor('res_team', '👥 รายชื่อเจ้าหน้าที่')"></textarea>
+        
+        <label>📢 ผู้รายงาน</label>
+        <input type="text" id="res_sender" placeholder="แตะเพื่อระบุผู้รายงาน" readonly onclick="openEditor('res_sender', '📢 ผู้รายงาน')">
+        
+        <button class="btn-submit btn-yellow" onclick="reportRescue()">คัดลอกและส่งรายงานการช่วยเหลือ</button>
+    </div>
+
+    <div id="copyHint" class="copy-hint">✅ คัดลอกและบันทึกข้อมูลแล้ว!</div>
+    <div id="output"></div>
+</div>
+
+<div id="editorOverlay" class="overlay">
+    <div class="editor-container">
+        <h4 id="editor-title">📝 แก้ไขข้อมูล</h4>
+        <textarea id="expanded-text" placeholder="พิมพ์ข้อมูลที่นี่..."></textarea>
+        <div class="editor-footer">
+            <button class="btn-cancel" onclick="closeEditor(false)">ยกเลิก</button>
+            <button class="btn-save" onclick="closeEditor(true)">ตกลง</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentTargetId = ''; 
+
+    function openEditor(id, title) {
+        currentTargetId = id;
+        document.getElementById('editor-title').innerText = title;
+        const mainVal = document.getElementById(id).value;
+        document.getElementById('expanded-text').value = mainVal;
+        document.getElementById('editorOverlay').style.display = 'flex';
+        
+        const textarea = document.getElementById('expanded-text');
+        setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        }, 100);
+    }
+
+    function closeEditor(isSave) {
+        if (isSave) {
+            const newVal = document.getElementById('expanded-text').value;
+            document.getElementById(currentTargetId).value = newVal;
+        }
+        document.getElementById('editorOverlay').style.display = 'none';
+    }
+
+    const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL";
+
+    function showHint() {
+        const hint = document.getElementById('copyHint');
+        hint.style.display = 'block';
+        setTimeout(() => { hint.style.display = 'none'; }, 2500);
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    async function processAndSend(text, jsonData) {
+        const out = document.getElementById('output');
+        out.innerText = text;
+        out.style.display = 'block';
+
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            let textArea = document.createElement("textarea");
+            textArea.value = text; document.body.appendChild(textArea);
+            textArea.select(); document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+        showHint();
+        if (GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_SCRIPT_URL") {
+            try {
+                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(jsonData) });
+            } catch (e) { console.error(e); }
+        }
+    }
+
+    function reportFire() {
+        let cars = [];
+        for(let i=1; i<=3; i++) {
+            let val = document.getElementById('fire_car' + i).value;
+            if(val) cars.push(val);
+        }
+        const text = `ส.ดพ.บางขุนเทียน\n🔥 รายงานเหตุเพลิงไหม้\nสถานที่/พิกัด: ${document.getElementById('fire_place').value || '-'}\nรถที่ออกเหตุ: ${cars.join(', ') || '-'}\nเวลารับแจ้ง: ${document.getElementById('f_t1').value || '--:--'} น.\nเวลาแจ้งออก: ${document.getElementById('f_t2').value || '--:--'} น.\nเวลา ว.10: ${document.getElementById('f_t3').value || '--:--'} น.\nเริ่มใช้น้ำ: ${document.getElementById('f_t4').value || '--:--'} น.\nเลิก ว.10: ${document.getElementById('f_t5').value || '--:--'} น.\nว.4 ส.ดพ.: ${document.getElementById('f_t6').value || '--:--'} น.\nผู้ปฏิบัติ: ${document.getElementById('fire_team').value || '-'}\nผู้รายงาน: ${document.getElementById('fire_sender').value || '-'}`;
+        processAndSend(text, { type: "เพลิงไหม้", staff: document.getElementById('fire_team').value, sender: document.getElementById('fire_sender').value });
+    }
+
+    function reportRescue() {
+        const text = `ส.ดพ.บางขุนเทียน\n🐾 เหตุช่วยเหลือประชาชน\nชนิด: ${document.getElementById('res_type_text').value || '-'}\nขนาด/จำนวน: ${document.getElementById('res_len_text').value || '-'}\nสถานที่/พิกัด: ${document.getElementById('res_place').value || '-'}\nรถที่ออกเหตุ: ${document.getElementById('res_car_single').value || '-'}\nเวลารับแจ้ง: ${document.getElementById('r_t1').value || '--:--'} น.\nเวลาแจ้งออก: ${document.getElementById('r_t2').value || '--:--'} น.\nเวลา ว.10: ${document.getElementById('r_t3').value || '--:--'} น.\nเลิก ว.10: ${document.getElementById('r_t4').value || '--:--'} น.\nว.4 ส.ดพ.: ${document.getElementById('r_t5').value || '--:--'} น.\nผู้ปฏิบัติ: ${document.getElementById('res_team').value || '-'}\nผู้รายงาน: ${document.getElementById('res_sender').value || '-'}`;
+        processAndSend(text, { type: "ช่วยเหลือประชาชน", staff: document.getElementById('res_team').value, sender: document.getElementById('res_sender').value });
+    }
+</script>
+
+</body>
+</html>
