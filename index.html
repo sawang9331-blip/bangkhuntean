@@ -44,7 +44,15 @@
         .btn-red { background-color: var(--primary-red); color: white; }
         .btn-yellow { background-color: var(--primary-yellow); color: #000; }
         
-        #output { background: #fff; color: #000; padding: 15px; border-radius: 10px; margin-top: 20px; white-space: pre-wrap; display: none; border-left: 8px solid #2e7d32; font-size: 15px; line-height: 1.6; }
+        /* แก้ไขส่วนแสดงผลรายงานให้เด่นชัดขึ้น */
+        #output-section { margin-top: 25px; display: none; }
+        #output-header { color: #4caf50; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+        #output { 
+            background: #ffffff; color: #000000; padding: 15px; border-radius: 10px; 
+            white-space: pre-wrap; border-left: 8px solid #2e7d32; font-size: 15px; 
+            line-height: 1.6; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
         .copy-hint { color: #4caf50; font-weight: bold; display: none; text-align: center; margin: 15px 0; font-size: 18px; border: 2px solid #4caf50; padding: 10px; border-radius: 8px; background: rgba(76, 175, 80, 0.1); }
 
         /* Overlay */
@@ -124,8 +132,12 @@
         <button class="btn-submit btn-yellow" onclick="reportRescue()">คัดลอกและส่งรายงานการช่วยเหลือ</button>
     </div>
 
+    <div id="output-section">
+        <div id="output-header">✅ คัดลอกสำเร็จ! ตัวอย่างรายงานด้านล่าง:</div>
+        <div id="output"></div>
+    </div>
+    
     <div id="copyHint" class="copy-hint">✅ คัดลอกลง Clipboard แล้ว!</div>
-    <div id="output"></div>
 </div>
 
 <div id="editorOverlay" class="overlay">
@@ -151,14 +163,12 @@
         "บางขุนเทียน 144-1", "บางขุนเทียน 173-1", "บางขุนเทียน 181-1", "บางขุนเทียน 182-1"
     ];
 
-    // Function สำหรับดึงวันที่ไทย
     function getThaiDate() {
         const now = new Date();
         const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         return `วันที่ ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear() + 543}`;
     }
 
-    // Populate Car Selects
     function initCars() {
         const selects = document.querySelectorAll('.car-select');
         selects.forEach(sel => {
@@ -190,20 +200,19 @@
         document.getElementById('editorOverlay').style.display = 'none';
     }
 
-    function showHint() {
-        const hint = document.getElementById('copyHint');
-        hint.style.display = 'block';
-        setTimeout(() => { hint.style.display = 'none'; }, 2000);
-    }
-
     async function processAndSend(text) {
-        const out = document.getElementById('output');
-        out.innerText = text;
-        out.style.display = 'block';
+        // แสดงส่วน Output และเลื่อนหน้าจอลงมาดู
+        const outSection = document.getElementById('output-section');
+        const outDisplay = document.getElementById('output');
+        outDisplay.innerText = text;
+        outSection.style.display = 'block';
+        outSection.scrollIntoView({ behavior: 'smooth' });
 
         try {
             await navigator.clipboard.writeText(text);
-            showHint();
+            const hint = document.getElementById('copyHint');
+            hint.style.display = 'block';
+            setTimeout(() => { hint.style.display = 'none'; }, 2000);
         } catch (err) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
@@ -211,7 +220,6 @@
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            showHint();
         }
     }
 
@@ -222,13 +230,11 @@
             if(v) cars.push(v);
         });
         
-        // เพิ่ม getThaiDate() บรรทัดแรก
         const text = `${getThaiDate()}\nส.ดพ.บางขุนเทียน\n🔥 รายงานเหตุเพลิงไหม้\nสถานที่/พิกัด: ${document.getElementById('fire_place').value || '-'}\nรถที่ออกเหตุ: ${cars.join(', ') || '-'}\nเวลารับแจ้ง: ${document.getElementById('f_t1').value || '--:--'} น.\nเวลาแจ้งออก: ${document.getElementById('f_t2').value || '--:--'} น.\nเวลา ว.10: ${document.getElementById('f_t3').value || '--:--'} น.\nเริ่มใช้น้ำ: ${document.getElementById('f_t4').value || '--:--'} น.\nเลิก ว.10: ${document.getElementById('f_t5').value || '--:--'} น.\nว.4 ส.ดพ.: ${document.getElementById('f_t6').value || '--:--'} น.\nผู้ปฏิบัติ: ${document.getElementById('fire_team').value || '-'}\nผู้รายงาน: ${document.getElementById('fire_sender').value || '-'}`;
         processAndSend(text);
     }
 
     function reportRescue() {
-        // เพิ่ม getThaiDate() บรรทัดแรก
         const text = `${getThaiDate()}\nส.ดพ.บางขุนเทียน\n🐾 เหตุช่วยเหลือประชาชน\nชนิด: ${document.getElementById('res_type_text').value || '-'}\nขนาด/จำนวน: ${document.getElementById('res_len_text').value || '-'}\nสถานที่/พิกัด: ${document.getElementById('res_place').value || '-'}\nรถที่ออกเหตุ: ${document.getElementById('res_car_single').value || '-'}\nเวลารับแจ้ง: ${document.getElementById('r_t1').value || '--:--'} น.\nเวลาแจ้งออก: ${document.getElementById('r_t2').value || '--:--'} น.\nเวลา ว.10: ${document.getElementById('r_t3').value || '--:--'} น.\nเลิก ว.10: ${document.getElementById('r_t4').value || '--:--'} น.\nว.4 ส.ดพ.: ${document.getElementById('r_t5').value || '--:--'} น.\nผู้ปฏิบัติ: ${document.getElementById('res_team').value || '-'}\nผู้รายงาน: ${document.getElementById('res_sender').value || '-'}`;
         processAndSend(text);
     }
