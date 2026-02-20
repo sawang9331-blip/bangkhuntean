@@ -151,6 +151,13 @@
         "บางขุนเทียน 144-1", "บางขุนเทียน 173-1", "บางขุนเทียน 181-1", "บางขุนเทียน 182-1"
     ];
 
+    // Function สำหรับดึงวันที่ไทย
+    function getThaiDate() {
+        const now = new Date();
+        const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        return `วันที่ ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear() + 543}`;
+    }
+
     // Populate Car Selects
     function initCars() {
         const selects = document.querySelectorAll('.car-select');
@@ -198,7 +205,6 @@
             await navigator.clipboard.writeText(text);
             showHint();
         } catch (err) {
-            // Fallback for older browsers
             const textArea = document.createElement("textarea");
             textArea.value = text;
             document.body.appendChild(textArea);
@@ -216,12 +222,14 @@
             if(v) cars.push(v);
         });
         
-        const text = `ส.ดพ.บางขุนเทียน\n🔥 รายงานเหตุเพลิงไหม้\nสถานที่/พิกัด: ${document.getElementById('fire_place').value || '-'}\nรถที่ออกเหตุ: ${cars.join(', ') || '-'}\nเวลารับแจ้ง: ${document.getElementById('f_t1').value || '--:--'} น.\nเวลาแจ้งออก: ${document.getElementById('f_t2').value || '--:--'} น.\nเวลา ว.10: ${document.getElementById('f_t3').value || '--:--'} น.\nเริ่มใช้น้ำ: ${document.getElementById('f_t4').value || '--:--'} น.\nเลิก ว.10: ${document.getElementById('f_t5').value || '--:--'} น.\nว.4 ส.ดพ.: ${document.getElementById('f_t6').value || '--:--'} น.\nผู้ปฏิบัติ: ${document.getElementById('fire_team').value || '-'}\nผู้รายงาน: ${document.getElementById('fire_sender').value || '-'}`;
+        // เพิ่ม getThaiDate() บรรทัดแรก
+        const text = `${getThaiDate()}\nส.ดพ.บางขุนเทียน\n🔥 รายงานเหตุเพลิงไหม้\nสถานที่/พิกัด: ${document.getElementById('fire_place').value || '-'}\nรถที่ออกเหตุ: ${cars.join(', ') || '-'}\nเวลารับแจ้ง: ${document.getElementById('f_t1').value || '--:--'} น.\nเวลาแจ้งออก: ${document.getElementById('f_t2').value || '--:--'} น.\nเวลา ว.10: ${document.getElementById('f_t3').value || '--:--'} น.\nเริ่มใช้น้ำ: ${document.getElementById('f_t4').value || '--:--'} น.\nเลิก ว.10: ${document.getElementById('f_t5').value || '--:--'} น.\nว.4 ส.ดพ.: ${document.getElementById('f_t6').value || '--:--'} น.\nผู้ปฏิบัติ: ${document.getElementById('fire_team').value || '-'}\nผู้รายงาน: ${document.getElementById('fire_sender').value || '-'}`;
         processAndSend(text);
     }
 
     function reportRescue() {
-        const text = `ส.ดพ.บางขุนเทียน\n🐾 เหตุช่วยเหลือประชาชน\nชนิด: ${document.getElementById('res_type_text').value || '-'}\nขนาด/จำนวน: ${document.getElementById('res_len_text').value || '-'}\nสถานที่/พิกัด: ${document.getElementById('res_place').value || '-'}\nรถที่ออกเหตุ: ${document.getElementById('res_car_single').value || '-'}\nเวลารับแจ้ง: ${document.getElementById('r_t1').value || '--:--'} น.\nเวลาแจ้งออก: ${document.getElementById('r_t2').value || '--:--'} น.\nเวลา ว.10: ${document.getElementById('r_t3').value || '--:--'} น.\nเลิก ว.10: ${document.getElementById('r_t4').value || '--:--'} น.\nว.4 ส.ดพ.: ${document.getElementById('r_t5').value || '--:--'} น.\nผู้ปฏิบัติ: ${document.getElementById('res_team').value || '-'}\nผู้รายงาน: ${document.getElementById('res_sender').value || '-'}`;
+        // เพิ่ม getThaiDate() บรรทัดแรก
+        const text = `${getThaiDate()}\nส.ดพ.บางขุนเทียน\n🐾 เหตุช่วยเหลือประชาชน\nชนิด: ${document.getElementById('res_type_text').value || '-'}\nขนาด/จำนวน: ${document.getElementById('res_len_text').value || '-'}\nสถานที่/พิกัด: ${document.getElementById('res_place').value || '-'}\nรถที่ออกเหตุ: ${document.getElementById('res_car_single').value || '-'}\nเวลารับแจ้ง: ${document.getElementById('r_t1').value || '--:--'} น.\nเวลาแจ้งออก: ${document.getElementById('r_t2').value || '--:--'} น.\nเวลา ว.10: ${document.getElementById('r_t3').value || '--:--'} น.\nเลิก ว.10: ${document.getElementById('r_t4').value || '--:--'} น.\nว.4 ส.ดพ.: ${document.getElementById('r_t5').value || '--:--'} น.\nผู้ปฏิบัติ: ${document.getElementById('res_team').value || '-'}\nผู้รายงาน: ${document.getElementById('res_sender').value || '-'}`;
         processAndSend(text);
     }
 </script>
